@@ -40,11 +40,11 @@ module parser
                 
                         case(0)
                             
-                if (.not. (acceptString('num'))) then
+                if (.not. (peg_num())) then
                     cycle
                 end if
                 do while (.not. cursor > len(input))
-                    if (.not. (acceptString('num'))) then
+                    if (.not. (peg_num())) then
                         exit
                     end if
                 end do
@@ -55,11 +55,11 @@ module parser
                 end if
                 
 
-                if (.not. (acceptString('num'))) then
+                if (.not. (peg_num())) then
                     cycle
                 end if
                 do while (.not. cursor > len(input))
-                    if (.not. (acceptString('num'))) then
+                    if (.not. (peg_num())) then
                         exit
                     end if
                 end do
@@ -74,7 +74,7 @@ module parser
 
                         case(1)
                             
-                if (.not. (acceptString('letra'))) then
+                if (.not. (peg_letra())) then
                     cycle
                 end if
                 
@@ -84,7 +84,7 @@ module parser
                 end if
                 
 
-                if (.not. (acceptString('letra'))) then
+                if (.not. (peg_letra())) then
                     cycle
                 end if
                 
