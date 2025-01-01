@@ -286,7 +286,7 @@ function peg$parse(input, options) {
             throw new Error(`Rango inválido: [${inicio}-${fin}]`);
 
         }
-        return `${inicio}-${fin}`;
+        return `${inicio}-${fin}`;//se debe crear la lista
     };
   var peg$f5 = function() { return text()};
   var peg$f6 = function() { return text() };
@@ -1413,9 +1413,6 @@ function peg$parse(input, options) {
         peg$currPos = s0;
         s0 = peg$FAILED;
       }
-      if (s0 === peg$FAILED) {
-        s0 = peg$parsecontinuacionLinea();
-      }
     }
 
     return s0;
@@ -1481,9 +1478,6 @@ function peg$parse(input, options) {
       } else {
         peg$currPos = s0;
         s0 = peg$FAILED;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$parsecontinuacionLinea();
       }
     }
 
