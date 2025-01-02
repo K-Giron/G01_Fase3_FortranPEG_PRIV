@@ -3,6 +3,7 @@ program test
 	implicit none
 	character(len=100) :: filename
 	character(len=:), allocatable :: input
+	character(len=:), allocatable :: resultado
 	integer :: u, len
 	logical :: exists
 
@@ -18,7 +19,8 @@ program test
 		open (1, file=filename, status='old', action='read', access='stream', form='unformatted')
 		allocate (character(len=len) :: input)
         read (1) input
-		call parse(input)
+		resultado = parse(input)
+		print *, "Resultado de parse:", resultado
 	else
 		print *, "error: file is not present"
 		stop
