@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(gdb) Iniciar",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/fases/fase3/test/prueba.exe", // Ruta al ejecutable
+      "args": ["prueba.txt"], // Archivo de entrada si lo necesitas
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/fases/fase3/test", // Directorio de trabajo
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:\\Users\\kevin\\gcc\\bin\\gdb.exe", // Ruta a GDB
+      "setupCommands": [
+        {
+          "description": "Habilitar la impresión con sangría para gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Establecer tipo de desensamblado en Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Agregar directorio fuente",
+          "text": "directory ${workspaceFolder}/fases/fase3/test",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

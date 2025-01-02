@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compilar Fortran",
+      "type": "shell",
+      "command": "C:\\Users\\kevin\\gcc\\bin\\gfortran.exe",
+      "args": [
+        "-g", // Habilitar información de depuración
+        "-c",
+        "${workspaceFolder}/fases/fase3/test/parser.f90"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Compilar Test",
+      "type": "shell",
+      "command": "C:\\Users\\kevin\\gcc\\bin\\gfortran.exe",
+      "args": ["-g", "-c", "test.f90"],
+      "group": {
+        "kind": "build"
+      },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Enlazar Ejecutable",
+      "type": "shell",
+      "command": "C:\\Users\\kevin\\gcc\\bin\\gfortran.exe",
+      "args": ["-g", "parser.o", "test.o", "-o", "prueba.exe"],
+      "group": {
+        "kind": "build"
+      },
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}

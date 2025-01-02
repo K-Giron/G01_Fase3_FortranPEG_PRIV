@@ -110,7 +110,7 @@ module parser
    subroutine pegError()
        print '(A,I1,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
 
-       call exit(1)
+       !call exit(1)
    end subroutine pegError
 
    function intToStr(int) result(cast)
@@ -162,14 +162,16 @@ export const rule = (data) => `
 export const election = (data) => `
        do i = 0, ${data.exprs.length}
            select case(i)
-           ${data.exprs.map(
-             (expr, i) => `
+           ${data.exprs
+             .map(
+               (expr, i) => `
            case(${i})
                cursor = savePoint
                ${expr}
                exit
            `
-           ).join('')}
+             )
+             .join("")}
            case default
                call pegError()
            end select
@@ -219,7 +221,7 @@ export const strExpr = (data) => {
                ${data.destination} = consumeInput()
            `;
     case "*":
-        return `
+      return `
             lexemeStart = cursor
             do while (.not. cursor > len(input))
                 if (.not. (${data.expr})) then
@@ -229,13 +231,13 @@ export const strExpr = (data) => {
             ${data.destination} = consumeInput()
         `;
     case "?":
-        return `
+      return `
             lexemeStart = cursor
             if ((${data.expr})) then
             end if
             ${data.destination} = consumeInput()
         `;
-    
+
     default:
       throw new Error(`'${data.quantifier}' quantifier needs implementation`);
   }
