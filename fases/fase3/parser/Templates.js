@@ -169,7 +169,7 @@ export const election = (data) => `
                ${expr}
                exit
            `
-           )}
+           ).join('')}
            case default
                call pegError()
            end select
@@ -218,6 +218,24 @@ export const strExpr = (data) => {
                end do
                ${data.destination} = consumeInput()
            `;
+    case "*":
+        return `
+            lexemeStart = cursor
+            do while (.not. cursor > len(input))
+                if (.not. (${data.expr})) then
+                    exit
+                end if
+            end do
+            ${data.destination} = consumeInput()
+        `;
+    case "?":
+        return `
+            lexemeStart = cursor
+            if ((${data.expr})) then
+            end if
+            ${data.destination} = consumeInput()
+        `;
+    
     default:
       throw new Error(`'${data.quantifier}' quantifier needs implementation`);
   }
