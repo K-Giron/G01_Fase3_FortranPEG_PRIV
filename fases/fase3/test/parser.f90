@@ -11,25 +11,31 @@ module parser
    end interface
    
    
+   
 
    contains
    
-   
+   subroutine decirHola
+        print *, "Hola desde accion"
+    end subroutine decirHola
+
 
    function parse(str) result(res)
        character(len=:), allocatable :: str
-       character(len=:), allocatable :: res
+       integer :: res
 
        input = str
        cursor = 1
 
-       res = peg_regla()
+       res = peg_suma()
    end function parse
 
    
-   function peg_regla() result (res)
-       character(len=:), allocatable :: res
-       character(len=:), allocatable :: expr_0_0
+   function peg_suma() result (res)
+       integer :: res
+       integer :: expr_0_0
+character(len=:), allocatable :: expr_0_1
+integer :: expr_0_2
        integer :: i
 
        savePoint = cursor
@@ -40,10 +46,16 @@ module parser
            case(0)
                cursor = savePoint
                
-               expr_0_0 = peg_numero()
+               expr_0_0 = peg_num()
+
+               lexemeStart = cursor
+               if(.not. acceptString('+')) cycle
+               expr_0_1 = consumeInput()
+       
+expr_0_2 = peg_num()
                if (.not. acceptEOF()) cycle
                
-               res = toStr(expr_0_0)
+               res = peg_suma_f0(expr_0_0, expr_0_2)
 
 
                exit
@@ -53,11 +65,11 @@ module parser
            end select
        end do
 
-   end function peg_regla
+   end function peg_suma
 
 
-   function peg_numero() result (res)
-       character(len=:), allocatable :: res
+   function peg_num() result (res)
+       integer :: res
        character(len=:), allocatable :: expr_0_0
        integer :: i
 
@@ -71,12 +83,15 @@ module parser
                
                
                lexemeStart = cursor
-               if(.not. (acceptRange('0', '9'))) cycle
+               if (.not. (acceptRange('0', '9'))) cycle
+               do while (.not. cursor > len(input))
+                   if (.not. (acceptRange('0', '9'))) exit
+               end do
                expr_0_0 = consumeInput()
-       
+           
                
                
-               res = toStr(expr_0_0)
+               res = peg_num_f0(expr_0_0)
 
 
                exit
@@ -86,9 +101,35 @@ module parser
            end select
        end do
 
-   end function peg_numero
+   end function peg_num
 
 
+   
+   function peg_suma_f0(n1, n2) result(res)
+       integer :: n1
+integer :: n2
+       integer :: res
+       
+
+        call decirHola()
+
+        res = n1 + n2;
+    
+   end function peg_suma_f0
+   
+
+   function peg_num_f0(num) result(res)
+       character(len=:), allocatable :: num
+       integer :: res
+       
+        integer :: tmp
+
+        call decirHola()
+
+        read(num, *) tmp
+        res = tmp
+    
+   end function peg_num_f0
    
 
    function acceptString(str) result(accept)
@@ -159,7 +200,7 @@ module parser
    subroutine pegError()
        print '(A,I1,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
 
-       call exit(1)
+       !call exit(1)
    end subroutine pegError
 
    function intToStr(int) result(cast)
