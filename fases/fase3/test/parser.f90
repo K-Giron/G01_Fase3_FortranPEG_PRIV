@@ -14,6 +14,34 @@ module parser
 
    contains
    
+   function replace_special_characters(input_string) result(output_string)
+    implicit none
+    character(len=:), allocatable, intent(in) :: input_string
+    character(len=:), allocatable :: output_string
+    character(len=1) :: current_char
+    integer :: i, char_ascii, length
+    character(len=:), allocatable :: temp_string
+
+    temp_string = ""
+    length = len(input_string)
+
+    do i = 1, length
+        current_char = input_string(i:i)
+        char_ascii = ichar(current_char)
+
+        ! Verificar si el carácter actual es un carácter especial
+        select case (char_ascii)
+        case (9, 10, 13,32) ! Tabulación, nueva línea, retorno de carro
+            ! No incluir este carácter en la salida
+        case default
+            temp_string = temp_string // current_char
+        end select
+    end do
+
+    allocate(character(len=len(temp_string)) :: output_string)
+    output_string = temp_string
+end function replace_special_characters
+   
    
 
    function parse(str) result(res)
@@ -23,93 +51,55 @@ module parser
        input = str
        cursor = 1
 
-       res = peg_sum()
+       !limpiar caracteres especiales
+       input = replace_special_characters(input)
+
+       res = peg_regla()
    end function parse
 
    
-   function peg_sum() result (res)
+   function peg_regla() result (res)
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
 character(len=:), allocatable :: expr_0_1
 character(len=:), allocatable :: expr_0_2
-character(len=:), allocatable :: expr_1_0
-character(len=:), allocatable :: expr_1_1
-character(len=:), allocatable :: expr_1_2
-character(len=:), allocatable :: expr_2_0
+character(len=:), allocatable :: expr_0_3
+character(len=:), allocatable :: expr_0_4
+character(len=:), allocatable :: expr_0_5
+character(len=:), allocatable :: expr_0_6
+character(len=:), allocatable :: expr_0_7
+character(len=:), allocatable :: expr_0_8
        character(len=:), allocatable :: Ayuda
        integer :: i
 
        savePoint = cursor
        
-       do i = 0, 3
+       do i = 0, 1
            select case(i)
            
            case(0)
                cursor = savePoint
                
-               
-              Ayuda = peg_num()
-              if(Ayuda == '')then
-                expr_0_0 = Ayuda
-              else
-                expr_0_0 = Ayuda
-              end if
-          
+               expr_0_0 = peg_fizz()
+expr_0_1 = peg__()
 
                lexemeStart = cursor
-               if(.not. acceptString('+')) cycle
-               expr_0_1 = consumeInput()
+               if(.not. acceptString('buzz')) cycle
+               expr_0_2 = consumeInput()
        
-
-            do while(.not. cursor > len(input))
-              Ayuda = peg_num()
-              
-              if(Ayuda == '')then
-                exit
-              end if
-
-              if(.not. allocated(expr_0_2))then
-              expr_0_2 = Ayuda
-              else
-              expr_0_2 = expr_0_2 // Ayuda
-              end if
-            end do
-
-            if(.not. allocated(expr_0_2))then
-              expr_0_2 = Ayuda
-            end if
-          
-               if (.not. acceptEOF()) cycle
-               
-               res = toStr(expr_0_0)//toStr(expr_0_1)//toStr(expr_0_2)
-
-
-               exit
-           
-           case(1)
-               cursor = savePoint
-               
-               expr_1_0 = peg_letra()
+expr_0_3 = peg__()
+expr_0_4 = peg_foo()
+expr_0_5 = peg__()
 
                lexemeStart = cursor
-               if(.not. acceptString('+')) cycle
-               expr_1_1 = consumeInput()
+               if(.not. acceptString('bar')) cycle
+               expr_0_6 = consumeInput()
        
-expr_1_2 = peg_letra()
+expr_0_7 = peg__()
+expr_0_8 = peg_baz()
                if (.not. acceptEOF()) cycle
                
-               res = toStr(expr_1_0)//toStr(expr_1_1)//toStr(expr_1_2)
-
-
-               exit
-           
-           case(2)
-               cursor = savePoint
-               
-               expr_2_0 = peg_mayuscula()
-               if (.not. acceptEOF()) cycle
-               
-               res = toStr(expr_2_0)
+               res = toStr(expr_0_0)//toStr(expr_0_1)//toStr(expr_0_2)//toStr(expr_0_3)//toStr(expr_0_4)//toStr(expr_0_5)//toStr(expr_0_6)//toStr(expr_0_7)//toStr(expr_0_8)
 
 
                exit
@@ -119,10 +109,10 @@ expr_1_2 = peg_letra()
            end select
        end do
 
-   end function peg_sum
+   end function peg_regla
 
 
-   function peg_num() result (res)
+   function peg_fizz() result (res)
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
        character(len=:), allocatable :: Ayuda
@@ -138,7 +128,7 @@ expr_1_2 = peg_letra()
                
                
                lexemeStart = cursor
-               if(.not. (acceptRange('0', '9'))) cycle
+               if(.not. acceptString('fizz')) cycle
                expr_0_0 = consumeInput()
        
                
@@ -153,10 +143,10 @@ expr_1_2 = peg_letra()
            end select
        end do
 
-   end function peg_num
+   end function peg_fizz
 
 
-   function peg_letra() result (res)
+   function peg_foo() result (res)
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
        character(len=:), allocatable :: Ayuda
@@ -172,9 +162,77 @@ expr_1_2 = peg_letra()
                
                
                lexemeStart = cursor
-               if (.not. (acceptRange('a', 'z'))) cycle
+               if(.not. acceptString('foo')) cycle
+               expr_0_0 = consumeInput()
+       
+               
+               
+               res = toStr(expr_0_0)
+
+
+               exit
+           
+           case default
+               call pegError()
+           end select
+       end do
+
+   end function peg_foo
+
+
+   function peg_baz() result (res)
+       character(len=:), allocatable :: res
+       character(len=:), allocatable :: expr_0_0
+       character(len=:), allocatable :: Ayuda
+       integer :: i
+
+       savePoint = cursor
+       
+       do i = 0, 1
+           select case(i)
+           
+           case(0)
+               cursor = savePoint
+               
+               
+               lexemeStart = cursor
+               if(.not. acceptString('baz')) cycle
+               expr_0_0 = consumeInput()
+       
+               
+               
+               res = peg_baz_f0(expr_0_0)
+
+
+               exit
+           
+           case default
+               call pegError()
+           end select
+       end do
+
+   end function peg_baz
+
+
+   function peg__() result (res)
+       character(len=:), allocatable :: res
+       character(len=:), allocatable :: expr_0_0
+       character(len=:), allocatable :: Ayuda
+       integer :: i
+
+       savePoint = cursor
+       
+       do i = 0, 1
+           select case(i)
+           
+           case(0)
+               cursor = savePoint
+               
+               
+               lexemeStart = cursor
+               if (.not. (acceptSet([char(32),char(9),char(10),char(13)]))) cycle
                do while (.not. cursor > len(input))
-                   if (.not. (acceptRange('a', 'z'))) exit
+                   if (.not. (acceptSet([char(32),char(9),char(10),char(13)]))) exit
                end do
                expr_0_0 = consumeInput()
            
@@ -190,44 +248,19 @@ expr_1_2 = peg_letra()
            end select
        end do
 
-   end function peg_letra
+   end function peg__
 
 
-   function peg_mayuscula() result (res)
+   
+   function peg_baz_f0(texto) result(res)
+       character(len=:), allocatable :: texto
        character(len=:), allocatable :: res
-       character(len=:), allocatable :: expr_0_0
-       character(len=:), allocatable :: Ayuda
-       integer :: i
-
-       savePoint = cursor
        
-       do i = 0, 1
-           select case(i)
-           
-           case(0)
-               cursor = savePoint
-               
-               
-            lexemeStart = cursor
-            if (((acceptRange('A', 'Z')))) then
-            end if
-            expr_0_0 = consumeInput()
-        
-               
-               
-               res = toStr(expr_0_0)
 
-
-               exit
-           
-           case default
-               call pegError()
-           end select
-       end do
-
-   end function peg_mayuscula
-
-
+        print *, "Llegué a la última regla"
+        res = texto
+    
+   end function peg_baz_f0
    
 
    function acceptString(str) result(accept)
@@ -296,7 +329,7 @@ expr_1_2 = peg_letra()
    end function consumeInput
 
    subroutine pegError()
-       print '(A,I1,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
+       print '(A,I0,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
 
        !call exit(1)
    end subroutine pegError

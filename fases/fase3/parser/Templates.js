@@ -26,6 +26,34 @@ module parser
 
    contains
    
+   function replace_special_characters(input_string) result(output_string)
+    implicit none
+    character(len=:), allocatable, intent(in) :: input_string
+    character(len=:), allocatable :: output_string
+    character(len=1) :: current_char
+    integer :: i, char_ascii, length
+    character(len=:), allocatable :: temp_string
+
+    temp_string = ""
+    length = len(input_string)
+
+    do i = 1, length
+        current_char = input_string(i:i)
+        char_ascii = ichar(current_char)
+
+        ! Verificar si el carácter actual es un carácter especial
+        select case (char_ascii)
+        case (9, 10, 13,32) ! Tabulación, nueva línea, retorno de carro
+            ! No incluir este carácter en la salida
+        case default
+            temp_string = temp_string // current_char
+        end select
+    end do
+
+    allocate(character(len=len(temp_string)) :: output_string)
+    output_string = temp_string
+end function replace_special_characters
+   
    ${data.afterContains}
 
    function parse(str) result(res)
@@ -34,6 +62,9 @@ module parser
 
        input = str
        cursor = 1
+
+       !limpiar caracteres especiales
+       input = replace_special_characters(input)
 
        res = ${data.startingRuleId}()
    end function parse

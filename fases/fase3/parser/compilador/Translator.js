@@ -170,8 +170,8 @@ export default class FortranTranslator {
     if (node.qty && typeof node.qty === "string") {
       if (node.expr instanceof CST.Identificador) {
         // TODO: Implement quantifiers (i.e., ?, *, +)
-        if(node.qty == "*"){
-          const kleen =`
+        if (node.qty == "*") {
+          const kleen = `
             do while(.not. cursor > len(input))
               Ayuda = ${node.expr.accept(this)}
               
@@ -179,25 +179,34 @@ export default class FortranTranslator {
                 exit
               end if
 
-              if(.not. allocated(${getExprId(this.currentChoice,this.currentExpr)}))then
-              ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+              if(.not. allocated(${getExprId(
+                this.currentChoice,
+                this.currentExpr
+              )}))then
+              ${getExprId(this.currentChoice, this.currentExpr)} = Ayuda
               else
-              ${getExprId(this.currentChoice,this.currentExpr)} = ${getExprId(this.currentChoice,this.currentExpr)} // Ayuda
+              ${getExprId(this.currentChoice, this.currentExpr)} = ${getExprId(
+            this.currentChoice,
+            this.currentExpr
+          )} // Ayuda
               end if
             end do
 
-            if(.not. allocated(${getExprId(this.currentChoice,this.currentExpr)}))then
-              ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+            if(.not. allocated(${getExprId(
+              this.currentChoice,
+              this.currentExpr
+            )}))then
+              ${getExprId(this.currentChoice, this.currentExpr)} = Ayuda
             end if
-          `
-        return kleen;
-        }else if(node.qty == "+"){
-          const Opmas =`
+          `;
+          return kleen;
+        } else if (node.qty == "+") {
+          const Opmas = `
               Ayuda = ${node.expr.accept(this)}
               if(Ayuda == '')then
                 exit
               else
-                ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+                ${getExprId(this.currentChoice, this.currentExpr)} = Ayuda
                 do while(.not. cursor > len(input))
                   Ayuda = ${node.expr.accept(this)}
                   
@@ -205,26 +214,35 @@ export default class FortranTranslator {
                     exit
                   end if
 
-                  if(.not. allocated(${getExprId(this.currentChoice,this.currentExpr)}))then
-                  ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+                  if(.not. allocated(${getExprId(
+                    this.currentChoice,
+                    this.currentExpr
+                  )}))then
+                  ${getExprId(this.currentChoice, this.currentExpr)} = Ayuda
                   else
-                  ${getExprId(this.currentChoice,this.currentExpr)} = ${getExprId(this.currentChoice,this.currentExpr)} // Ayuda
+                  ${getExprId(
+                    this.currentChoice,
+                    this.currentExpr
+                  )} = ${getExprId(
+            this.currentChoice,
+            this.currentExpr
+          )} // Ayuda
                   end if
                 end do
               end if
-          `
+          `;
           return Opmas;
-        }else if(node.qty == "?"){
-          const Opopcional =`
+        } else if (node.qty == "?") {
+          const Opopcional = `
               Ayuda = ${node.expr.accept(this)}
               if(Ayuda == '')then
-                ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+                ${getExprId(this.currentChoice, this.currentExpr)} = Ayuda
               else
-                ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+                ${getExprId(this.currentChoice, this.currentExpr)} = Ayuda
               end if
-          `
+          `;
           return Opopcional;
-        }else{
+        } else {
           return `${getExprId(
             this.currentChoice,
             this.currentExpr
@@ -311,6 +329,23 @@ export default class FortranTranslator {
     const ranges = node.chars
       .filter((char) => char instanceof CST.Rango)
       .map((range) => range.accept(this));
+
+    //validación de cuando reconoce caracteres especiales como \n, \t, \r y espacio poner codigo ascii
+    for (let i = 0; i < set.length; i++) {
+      if (set[i] == "'\\n'") {
+        set[i] = "char(10)";
+      }
+      if (set[i] == "'\\t'") {
+        set[i] = "char(9)";
+      }
+      if (set[i] == "'\\r'") {
+        set[i] = "char(13)";
+      }
+      if (set[i] == "' '") {
+        set[i] = "char(32)";
+      }
+    }
+
     if (set.length !== 0) {
       characterClass = [`acceptSet([${set.join(",")}])`];
     }
