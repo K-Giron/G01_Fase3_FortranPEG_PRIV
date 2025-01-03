@@ -276,15 +276,24 @@ export default class FortranTranslator {
    * @this {Visitor}
    */
   visitAssertion(node) {
+    //comentario de no salio
+
     throw new Error("Method not implemented.");
   }
-
   /**
    * @param {CST.NegAssertion} node
    * @this {Visitor}
    */
   visitNegAssertion(node) {
-    throw new Error("Method not implemented.");
+    debugger;
+    //no guardar el valor solo avanzar el cursor
+    if (node.assertion instanceof CST.Predicate) {
+      return `
+        lexemeStart = cursor
+        if (${node.assertion.accept(this)}) cycle
+        consumeInput()
+      `;
+    }
   }
 
   /**

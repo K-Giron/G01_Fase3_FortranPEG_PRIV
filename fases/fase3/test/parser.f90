@@ -63,12 +63,6 @@ end function replace_special_characters
        character(len=:), allocatable :: expr_0_0
 character(len=:), allocatable :: expr_0_1
 character(len=:), allocatable :: expr_0_2
-character(len=:), allocatable :: expr_0_3
-character(len=:), allocatable :: expr_0_4
-character(len=:), allocatable :: expr_0_5
-character(len=:), allocatable :: expr_0_6
-character(len=:), allocatable :: expr_0_7
-character(len=:), allocatable :: expr_0_8
        character(len=:), allocatable :: Ayuda
        integer :: i
 
@@ -80,26 +74,17 @@ character(len=:), allocatable :: expr_0_8
            case(0)
                cursor = savePoint
                
-               expr_0_0 = peg_fizz()
+               expr_0_0 = peg_palabra()
+
 expr_0_1 = peg__()
 
                lexemeStart = cursor
-               if(.not. acceptString('buzz')) cycle
+               if(.not. acceptString('valido')) cycle
                expr_0_2 = consumeInput()
        
-expr_0_3 = peg__()
-expr_0_4 = peg_foo()
-expr_0_5 = peg__()
-
-               lexemeStart = cursor
-               if(.not. acceptString('bar')) cycle
-               expr_0_6 = consumeInput()
-       
-expr_0_7 = peg__()
-expr_0_8 = peg_baz()
                if (.not. acceptEOF()) cycle
                
-               res = toStr(expr_0_0)//toStr(expr_0_1)//toStr(expr_0_2)//toStr(expr_0_3)//toStr(expr_0_4)//toStr(expr_0_5)//toStr(expr_0_6)//toStr(expr_0_7)//toStr(expr_0_8)
+               res = toStr(expr_0_0)//toStr(expr_0_1)//toStr(expr_0_2)
 
 
                exit
@@ -112,7 +97,7 @@ expr_0_8 = peg_baz()
    end function peg_regla
 
 
-   function peg_fizz() result (res)
+   function peg_palabra() result (res)
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
        character(len=:), allocatable :: Ayuda
@@ -128,7 +113,7 @@ expr_0_8 = peg_baz()
                
                
                lexemeStart = cursor
-               if(.not. acceptString('fizz')) cycle
+               if(.not. acceptString('test')) cycle
                expr_0_0 = consumeInput()
        
                
@@ -143,10 +128,10 @@ expr_0_8 = peg_baz()
            end select
        end do
 
-   end function peg_fizz
+   end function peg_palabra
 
 
-   function peg_foo() result (res)
+   function peg_prohibido() result (res)
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
        character(len=:), allocatable :: Ayuda
@@ -162,7 +147,7 @@ expr_0_8 = peg_baz()
                
                
                lexemeStart = cursor
-               if(.not. acceptString('foo')) cycle
+               if(.not. acceptString('bad')) cycle
                expr_0_0 = consumeInput()
        
                
@@ -177,41 +162,7 @@ expr_0_8 = peg_baz()
            end select
        end do
 
-   end function peg_foo
-
-
-   function peg_baz() result (res)
-       character(len=:), allocatable :: res
-       character(len=:), allocatable :: expr_0_0
-       character(len=:), allocatable :: Ayuda
-       integer :: i
-
-       savePoint = cursor
-       
-       do i = 0, 1
-           select case(i)
-           
-           case(0)
-               cursor = savePoint
-               
-               
-               lexemeStart = cursor
-               if(.not. acceptString('baz')) cycle
-               expr_0_0 = consumeInput()
-       
-               
-               
-               res = peg_baz_f0(expr_0_0)
-
-
-               exit
-           
-           case default
-               call pegError()
-           end select
-       end do
-
-   end function peg_baz
+   end function peg_prohibido
 
 
    function peg__() result (res)
@@ -251,16 +202,6 @@ expr_0_8 = peg_baz()
    end function peg__
 
 
-   
-   function peg_baz_f0(texto) result(res)
-       character(len=:), allocatable :: texto
-       character(len=:), allocatable :: res
-       
-
-        print *, "Llegué a la última regla"
-        res = texto
-    
-   end function peg_baz_f0
    
 
    function acceptString(str) result(accept)
