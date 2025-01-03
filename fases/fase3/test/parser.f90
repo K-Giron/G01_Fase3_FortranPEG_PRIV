@@ -31,59 +31,61 @@ module parser
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
 character(len=:), allocatable :: expr_0_1
+character(len=:), allocatable :: expr_0_2
 character(len=:), allocatable :: expr_1_0
 character(len=:), allocatable :: expr_1_1
+character(len=:), allocatable :: expr_1_2
 character(len=:), allocatable :: expr_2_0
-character(len=:), allocatable :: expr_3_0
        integer :: i
 
        savePoint = cursor
        
-       do i = 0, 4
+       do i = 0, 3
            select case(i)
            
            case(0)
                cursor = savePoint
                
-               expr_0_0 = peg_numeros()
-expr_0_1 = peg_minuscula()
+               expr_0_0 = peg_num()
+
+               lexemeStart = cursor
+               if(.not. acceptString('+')) cycle
+               expr_0_1 = consumeInput()
+       
+expr_0_2 = peg_num()
                if (.not. acceptEOF()) cycle
                
-               res = toStr(expr_0_0)//toStr(expr_0_1)
+               res = toStr(expr_0_0)//toStr(expr_0_1)//toStr(expr_0_2)
 
 
                exit
            
+
            case(1)
                cursor = savePoint
                
-               expr_1_0 = peg_mayuscula()
-expr_1_1 = peg_minuscula()
+               expr_1_0 = peg_letra()
+
+               lexemeStart = cursor
+               if(.not. acceptString('+')) cycle
+               expr_1_1 = consumeInput()
+       
+expr_1_2 = peg_letra()
                if (.not. acceptEOF()) cycle
                
-               res = toStr(expr_1_0)//toStr(expr_1_1)
+               res = toStr(expr_1_0)//toStr(expr_1_1)//toStr(expr_1_2)
 
 
                exit
            
+
            case(2)
                cursor = savePoint
                
-               expr_2_0 = peg_minuscula()
+               expr_2_0 = peg_mayuscula()
                if (.not. acceptEOF()) cycle
                
                res = toStr(expr_2_0)
-
-
-               exit
-           
-           case(3)
-               cursor = savePoint
-               
-               expr_3_0 = peg_mayuscula()
-               if (.not. acceptEOF()) cycle
-               
-               res = toStr(expr_3_0)
 
 
                exit
@@ -96,7 +98,7 @@ expr_1_1 = peg_minuscula()
    end function peg_sum
 
 
-   function peg_numeros() result (res)
+   function peg_num() result (res)
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
        integer :: i
@@ -111,7 +113,7 @@ expr_1_1 = peg_minuscula()
                
                
                lexemeStart = cursor
-               if(.not. acceptString('hola')) cycle
+               if(.not. (acceptRange('0', '9'))) cycle
                expr_0_0 = consumeInput()
        
                
@@ -126,10 +128,10 @@ expr_1_1 = peg_minuscula()
            end select
        end do
 
-   end function peg_numeros
+   end function peg_num
 
 
-   function peg_minuscula() result (res)
+   function peg_letra() result (res)
        character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
        integer :: i
@@ -144,9 +146,9 @@ expr_1_1 = peg_minuscula()
                
                
                lexemeStart = cursor
-               if (.not. (acceptRange('0', '9'))) cycle
+               if (.not. (acceptRange('a', 'z'))) cycle
                do while (.not. cursor > len(input))
-                   if (.not. (acceptRange('0', '9'))) exit
+                   if (.not. (acceptRange('a', 'z'))) exit
                end do
                expr_0_0 = consumeInput()
            
@@ -162,7 +164,7 @@ expr_1_1 = peg_minuscula()
            end select
        end do
 
-   end function peg_minuscula
+   end function peg_letra
 
 
    function peg_mayuscula() result (res)
@@ -179,10 +181,11 @@ expr_1_1 = peg_minuscula()
                cursor = savePoint
                
                
-               lexemeStart = cursor
-               if(.not. acceptString('welcome')) cycle
-               expr_0_0 = consumeInput()
-       
+            lexemeStart = cursor
+            if (((acceptRange('A', 'Z')))) then
+            end if
+            expr_0_0 = consumeInput()
+        
                
                
                res = toStr(expr_0_0)
@@ -266,7 +269,7 @@ expr_1_1 = peg_minuscula()
    end function consumeInput
 
    subroutine pegError()
-       print '(A,I1,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
+       print '(A,I0,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
 
        !call exit(1)
    end subroutine pegError

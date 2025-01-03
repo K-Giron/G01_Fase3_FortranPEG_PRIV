@@ -108,7 +108,7 @@ module parser
    end function consumeInput
 
    subroutine pegError()
-       print '(A,I1,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
+       print '(A,I0,A)', "Error at ", cursor, ": '"//input(cursor:cursor)//"'"
 
        !call exit(1)
    end subroutine pegError
@@ -171,7 +171,7 @@ export const election = (data) => `
                exit
            `
              )
-             .join("")}
+             .join("\n")}
            case default
                call pegError()
            end select
