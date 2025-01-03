@@ -218,7 +218,7 @@ export default class FortranTranslator {
           const Opopcional =`
               Ayuda = ${node.expr.accept(this)}
               if(Ayuda == '')then
-                exit
+                ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
               else
                 ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
               end if
