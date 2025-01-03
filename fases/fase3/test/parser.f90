@@ -11,51 +11,105 @@ module parser
    end interface
    
    
-   
 
    contains
    
-   subroutine decirHola
-        print *, "Hola desde accion"
-    end subroutine decirHola
-
+   
 
    function parse(str) result(res)
        character(len=:), allocatable :: str
-       integer :: res
+       character(len=:), allocatable :: res
 
        input = str
        cursor = 1
 
-       res = peg_suma()
+       res = peg_sum()
    end function parse
 
    
-   function peg_suma() result (res)
-       integer :: res
-       integer :: expr_0_0
+   function peg_sum() result (res)
+       character(len=:), allocatable :: res
+       character(len=:), allocatable :: expr_0_0
 character(len=:), allocatable :: expr_0_1
-integer :: expr_0_2
+character(len=:), allocatable :: expr_0_2
+character(len=:), allocatable :: expr_1_0
+character(len=:), allocatable :: expr_1_1
+character(len=:), allocatable :: expr_1_2
+character(len=:), allocatable :: expr_2_0
+       character(len=:), allocatable :: Ayuda
        integer :: i
 
        savePoint = cursor
        
-       do i = 0, 1
+       do i = 0, 3
            select case(i)
            
            case(0)
                cursor = savePoint
                
-               expr_0_0 = peg_num()
+               
+              Ayuda = peg_num()
+              if(Ayuda == '')then
+                expr_0_0 = Ayuda
+              else
+                expr_0_0 = Ayuda
+              end if
+          
 
                lexemeStart = cursor
                if(.not. acceptString('+')) cycle
                expr_0_1 = consumeInput()
        
-expr_0_2 = peg_num()
+
+            do while(.not. cursor > len(input))
+              Ayuda = peg_num()
+              
+              if(Ayuda == '')then
+                exit
+              end if
+
+              if(.not. allocated(expr_0_2))then
+              expr_0_2 = Ayuda
+              else
+              expr_0_2 = expr_0_2 // Ayuda
+              end if
+            end do
+
+            if(.not. allocated(expr_0_2))then
+              expr_0_2 = Ayuda
+            end if
+          
                if (.not. acceptEOF()) cycle
                
-               res = peg_suma_f0(expr_0_0, expr_0_2)
+               res = toStr(expr_0_0)//toStr(expr_0_1)//toStr(expr_0_2)
+
+
+               exit
+           
+           case(1)
+               cursor = savePoint
+               
+               expr_1_0 = peg_letra()
+
+               lexemeStart = cursor
+               if(.not. acceptString('+')) cycle
+               expr_1_1 = consumeInput()
+       
+expr_1_2 = peg_letra()
+               if (.not. acceptEOF()) cycle
+               
+               res = toStr(expr_1_0)//toStr(expr_1_1)//toStr(expr_1_2)
+
+
+               exit
+           
+           case(2)
+               cursor = savePoint
+               
+               expr_2_0 = peg_mayuscula()
+               if (.not. acceptEOF()) cycle
+               
+               res = toStr(expr_2_0)
 
 
                exit
@@ -65,12 +119,13 @@ expr_0_2 = peg_num()
            end select
        end do
 
-   end function peg_suma
+   end function peg_sum
 
 
    function peg_num() result (res)
-       integer :: res
+       character(len=:), allocatable :: res
        character(len=:), allocatable :: expr_0_0
+       character(len=:), allocatable :: Ayuda
        integer :: i
 
        savePoint = cursor
@@ -83,15 +138,12 @@ expr_0_2 = peg_num()
                
                
                lexemeStart = cursor
-               if (.not. (acceptRange('0', '9'))) cycle
-               do while (.not. cursor > len(input))
-                   if (.not. (acceptRange('0', '9'))) exit
-               end do
+               if(.not. (acceptRange('0', '9'))) cycle
                expr_0_0 = consumeInput()
-           
+       
                
                
-               res = peg_num_f0(expr_0_0)
+               res = toStr(expr_0_0)
 
 
                exit
@@ -104,32 +156,78 @@ expr_0_2 = peg_num()
    end function peg_num
 
 
-   
-   function peg_suma_f0(n1, n2) result(res)
-       integer :: n1
-integer :: n2
-       integer :: res
+   function peg_letra() result (res)
+       character(len=:), allocatable :: res
+       character(len=:), allocatable :: expr_0_0
+       character(len=:), allocatable :: Ayuda
+       integer :: i
+
+       savePoint = cursor
        
+       do i = 0, 1
+           select case(i)
+           
+           case(0)
+               cursor = savePoint
+               
+               
+               lexemeStart = cursor
+               if (.not. (acceptRange('a', 'z'))) cycle
+               do while (.not. cursor > len(input))
+                   if (.not. (acceptRange('a', 'z'))) exit
+               end do
+               expr_0_0 = consumeInput()
+           
+               
+               
+               res = toStr(expr_0_0)
 
-        call decirHola()
 
-        res = n1 + n2;
-    
-   end function peg_suma_f0
-   
+               exit
+           
+           case default
+               call pegError()
+           end select
+       end do
 
-   function peg_num_f0(num) result(res)
-       character(len=:), allocatable :: num
-       integer :: res
+   end function peg_letra
+
+
+   function peg_mayuscula() result (res)
+       character(len=:), allocatable :: res
+       character(len=:), allocatable :: expr_0_0
+       character(len=:), allocatable :: Ayuda
+       integer :: i
+
+       savePoint = cursor
        
-        integer :: tmp
+       do i = 0, 1
+           select case(i)
+           
+           case(0)
+               cursor = savePoint
+               
+               
+            lexemeStart = cursor
+            if (((acceptRange('A', 'Z')))) then
+            end if
+            expr_0_0 = consumeInput()
+        
+               
+               
+               res = toStr(expr_0_0)
 
-        call decirHola()
 
-        read(num, *) tmp
-        res = tmp
-    
-   end function peg_num_f0
+               exit
+           
+           case default
+               call pegError()
+           end select
+       end do
+
+   end function peg_mayuscula
+
+
    
 
    function acceptString(str) result(accept)
