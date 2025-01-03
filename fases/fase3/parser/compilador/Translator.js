@@ -170,10 +170,66 @@ export default class FortranTranslator {
     if (node.qty && typeof node.qty === "string") {
       if (node.expr instanceof CST.Identificador) {
         // TODO: Implement quantifiers (i.e., ?, *, +)
-        return `${getExprId(
-          this.currentChoice,
-          this.currentExpr
-        )} = ${node.expr.accept(this)}`;
+        if(node.qty == "*"){
+          const kleen =`
+            do while(.not. cursor > len(input))
+              Ayuda = ${node.expr.accept(this)}
+              
+              if(Ayuda == '')then
+                exit
+              end if
+
+              if(.not. allocated(${getExprId(this.currentChoice,this.currentExpr)}))then
+              ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+              else
+              ${getExprId(this.currentChoice,this.currentExpr)} = ${getExprId(this.currentChoice,this.currentExpr)} // Ayuda
+              end if
+            end do
+
+            if(.not. allocated(${getExprId(this.currentChoice,this.currentExpr)}))then
+              ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+            end if
+          `
+        return kleen;
+        }else if(node.qty == "+"){
+          const Opmas =`
+              Ayuda = ${node.expr.accept(this)}
+              if(Ayuda == '')then
+                exit
+              else
+                ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+                do while(.not. cursor > len(input))
+                  Ayuda = ${node.expr.accept(this)}
+                  
+                  if(Ayuda == '')then
+                    exit
+                  end if
+
+                  if(.not. allocated(${getExprId(this.currentChoice,this.currentExpr)}))then
+                  ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+                  else
+                  ${getExprId(this.currentChoice,this.currentExpr)} = ${getExprId(this.currentChoice,this.currentExpr)} // Ayuda
+                  end if
+                end do
+              end if
+          `
+          return Opmas;
+        }else if(node.qty == "?"){
+          const Opopcional =`
+              Ayuda = ${node.expr.accept(this)}
+              if(Ayuda == '')then
+                exit
+              else
+                ${getExprId(this.currentChoice,this.currentExpr)} = Ayuda
+              end if
+          `
+          return Opopcional;
+        }else{
+          return `${getExprId(
+            this.currentChoice,
+            this.currentExpr
+          )} = ${node.expr.accept(this)}`;
+        }
       }
       return Template.strExpr({
         quantifier: node.qty,

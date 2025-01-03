@@ -145,6 +145,7 @@ export const rule = (data) => `
    function peg_${data.id}() result (res)
        ${data.returnType} :: res
        ${data.exprDeclarations.join("\n")}
+       character(len=:), allocatable :: Ayuda
        integer :: i
 
        savePoint = cursor
