@@ -4,7 +4,7 @@ program test
 
     character(len=100) :: filename
     character(len=:), allocatable :: input
-    integer :: resultado
+    character(len=:), allocatable :: resultado
     integer :: len
     logical :: exists
 
